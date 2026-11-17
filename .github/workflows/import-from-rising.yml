@@ -46,15 +46,16 @@ jobs:
               "EVO_BUILD_TYPE := Unofficial\nTARGET_PROVIDES_FACE_UNLOCK_HAL := true",
               1,
           )
-          s, count = re.subn(
-              r"PRODUCT_BUILD_PROP_OVERRIDES \+= \\\n"
-              r"    RisingChipset=.*\n"
-              r"    RisingMaintainer=.*\n\n",
-              "",
-              s,
-              count=1,
-          )
-          assert count == 1, "Unexpected RisingOS property override block"
+          lines = s.splitlines(keepends=True)
+          candidates = [i for i, line in enumerate(lines)
+                        if line.startswith("PRODUCT_BUILD_PROP_OVERRIDES")
+                        and i + 2 < len(lines)
+                        and "RisingChipset=" in lines[i + 1]
+                        and "RisingMaintainer=" in lines[i + 2]]
+          assert len(candidates) == 1, "Unexpected RisingOS property override block"
+          i = candidates[0]
+          del lines[i:i + 3]
+          s = "".join(lines)
           assert "TARGET_FACE_UNLOCK_SUPPORTED := false" in s
           assert "PRODUCT_NO_CAMERA := true" in s
           assert "device/google/coral/camera/camera.mk" in s
@@ -64,7 +65,8 @@ jobs:
           products = Path("AndroidProducts.mk")
           s = products.read_text()
           assert "$(LOCAL_DIR)/lineage_coral.mk" in s
-          products.write_text(s.rstrip() + "\n\nCOMMON_LUNCH_CHOICES := \\\n    lineage_coral-cp2a-userdebug \\\n    lineage_coral-cp2a-user\n")
+          products.write_text(s.rstrip() + chr(10) * 2 +
+                              "COMMON_LUNCH_CHOICES := lineage_coral-cp2a-userdebug" + chr(10))
 
           prop = Path("product.prop")
           s = prop.read_text()
