@@ -1,0 +1,96 @@
+name: Import RisingOS coral device tree for Evolution X
+on:
+  push:
+    paths:
+      - .github/workflows/import-from-rising.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GIT_LFS_SKIP_SMUDGE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Merge pinned RisingOS device source, preserving complete git history
+        run: |
+          set -euo pipefail
+          git config user.name Hecker
+          git config user.email 118846180+its-hecker@users.noreply.github.com
+          git remote add rising https://github.com/its-hecker/risingos-coral-dt.git
+          git fetch --no-tags rising main
+          test "$(git rev-parse FETCH_HEAD)" = "33a2b3252fae90422129a6097dca5eb0bd2e1eb3"
+          git merge --no-ff --no-edit --allow-unrelated-histories FETCH_HEAD
+          find .github/workflows -maxdepth 1 -type f ! -name import-from-rising.yml -delete
+
+      - name: Adapt coral product for Evolution X Android 17
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          product = Path("lineage_coral.mk")
+          s = product.read_text()
+          assert "RISING_MAINTAINER := Hecker" in s
+          s = s.replace(
+              "RISING_MAINTAINER := Hecker",
+              "EVO_BUILD_TYPE := Unofficial\nTARGET_PROVIDES_FACE_UNLOCK_HAL := true",
+              1,
+          )
+          s, count = re.subn(
+              r"PRODUCT_BUILD_PROP_OVERRIDES \+= \\\n"
+              r"    RisingChipset=.*\n"
+              r"    RisingMaintainer=.*\n\n",
+              "",
+              s,
+              count=1,
+          )
+          assert count == 1, "Unexpected RisingOS property override block"
+          assert "TARGET_FACE_UNLOCK_SUPPORTED := false" in s
+          assert "PRODUCT_NO_CAMERA := true" in s
+          assert "device/google/coral/camera/camera.mk" in s
+          assert "PRODUCT_NAME := lineage_coral" in s
+          product.write_text(s)
+
+          products = Path("AndroidProducts.mk")
+          s = products.read_text()
+          assert "$(LOCAL_DIR)/lineage_coral.mk" in s
+          products.write_text(s.rstrip() + "\n\nCOMMON_LUNCH_CHOICES := \\\n    lineage_coral-cp2a-userdebug \\\n    lineage_coral-cp2a-user\n")
+
+          prop = Path("product.prop")
+          s = prop.read_text()
+          s = s.replace("# RisingOS About Phone display properties", "# Pixel 4 XL identity", 1)
+          s = s.replace("ro.rising.camera=12.2MP + 16MP\n", "", 1)
+          prop.write_text(s)
+
+          common = Path("device-common.mk")
+          s = common.read_text()
+          s = s.replace(
+              "# Must come before vendor/infinity/overlay/common, which also defines",
+              "# Keep Oslo's allowlist overlay ahead of ROM common overlays, which define",
+              1,
+          )
+          s = s.replace(
+              "# GMS\nifeq ($(WITH_GMS),true)\nGMS_MAKEFILE = gms_minimal.mk\nendif\n",
+              "# Evolution X imports its GMS packages through vendor/lineage/config.\n",
+              1,
+          )
+          common.write_text(s)
+          print("Prepared EvoX coral product, IR Face HAL selection, GCam, Oslo overlays.")
+          PY
+          git add -A
+          git commit -m "evox: adapt Pixel 4 XL device product and retain IR Face HAL, Oslo and GCam"
+
+      - name: Push separate Evolution X device tree
+        run: |
+          set -euo pipefail
+          git -c core.hooksPath=/dev/null push origin HEAD:main
