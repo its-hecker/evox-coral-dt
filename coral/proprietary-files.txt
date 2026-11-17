@@ -7,7 +7,7 @@ product/priv-app/DeviceIntelligenceNetworkPrebuilt/DeviceIntelligenceNetworkPreb
 product/priv-app/DevicePersonalizationPrebuiltPixel4/DevicePersonalizationPrebuiltPixel4.apk;PRESIGNED
 
 # Audio
-product/etc/ambient/matcher_tah.leveldb
+# matcher_tah.leveldb is installed by Evolution X vendor/gms (Soong matcher_tah).
 product/etc/firmware/music_detector.descriptor
 product/etc/firmware/music_detector.sound_model
 product/priv-app/AmbientSensePrebuilt/AmbientSensePrebuilt.apk;PRESIGNED
