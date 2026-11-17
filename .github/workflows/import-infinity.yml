@@ -21,7 +21,7 @@ jobs:
         run: |
           set -euo pipefail
           GIT_LFS_SKIP_SMUDGE=1 git clone --single-branch --depth 1 --branch cnb-Latest-stable https://github.com/its-hecker/infinity_cnb_android_device_google_coral.git /tmp/infinity-coral
-          rsync -a --delete --exclude='/.git/' --exclude='/.github/workflows/import-infinity.yml' /tmp/infinity-coral/ ./
+          rsync -a --delete --exclude='/.git/' --exclude='/.github/' /tmp/infinity-coral/ ./
           python3 - <<'PY'
           from pathlib import Path
           products = Path("AndroidProducts.mk")
