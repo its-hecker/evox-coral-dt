@@ -12,3 +12,7 @@
 
 PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/lineage_coral.mk
+
+COMMON_LUNCH_CHOICES := \
+    lineage_coral-cp2a-userdebug \
+    lineage_coral-cp2a-user

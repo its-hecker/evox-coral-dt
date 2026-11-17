@@ -4,7 +4,8 @@
 # Infinity-X Build Flags
 # 3D face unlock (Pixel Neural Core) replaces Infinity's camera-based FaceUnlock
 TARGET_FACE_UNLOCK_SUPPORTED := false
-RISING_MAINTAINER := Hecker
+EVO_BUILD_TYPE := Unofficial
+TARGET_PROVIDES_FACE_UNLOCK_HAL := true
 TARGET_ENABLE_BLUR := true
 TARGET_HAS_UDFPS := false
 WITH_GMS := true
@@ -17,10 +18,6 @@ PRODUCT_MODULE_BUILD_FROM_SOURCE := true
 
 # RisingOS About Phone properties: market name and camera are in product.prop.
 # RisingChipset below generates ro.rising.chipset; do not define it twice.
-
-PRODUCT_BUILD_PROP_OVERRIDES += \
-    RisingChipset="Qualcomm Snapdragon 855" \
-    RisingMaintainer="Hecker"
 
 # Inherit some common Lineage stuff.
 $(call inherit-product, vendor/lineage/config/common_full_phone.mk)

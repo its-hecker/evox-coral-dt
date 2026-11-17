@@ -3,9 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# RisingOS About Phone display properties
+# Pixel 4 XL identity
 ro.product.marketname=Google Pixel 4 XL
-ro.rising.camera=12.2MP + 16MP
 
 # Bluetooth
 bluetooth.device.class_of_device=90,2,12

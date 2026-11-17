@@ -229,10 +229,7 @@ PRODUCT_PACKAGES += \
     fs_config_dirs \
     fs_config_files
 
-# GMS
-ifeq ($(WITH_GMS),true)
-GMS_MAKEFILE = gms_minimal.mk
-endif
+# Evolution X imports its GMS packages through vendor/lineage/config.
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -349,7 +346,7 @@ PRODUCT_COPY_FILES += \
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay
 DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
 
-# Must come before vendor/infinity/overlay/common, which also defines
+# Keep Oslo's allowlist overlay ahead of ROM common overlays, which define
 # SystemUI's config_pluginAllowlist (needed for the Oslo plugin).
 PRODUCT_PACKAGE_OVERLAYS := $(LOCAL_PATH)/overlay-oslo $(PRODUCT_PACKAGE_OVERLAYS)
 
