@@ -186,8 +186,10 @@ $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 PRODUCT_SET_DEBUGFS_RESTRICTIONS := true
 
 # Default Permissions
+# Use a device-specific filename so this rule does not override RisingOS's
+# product default-permissions.xml installation from Soong.
 PRODUCT_COPY_FILES += \
-    device/google/coral/configs/permissions/default-permissions.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/default-permissions/default-permissions.xml
+    device/google/coral/configs/permissions/default-permissions.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/default-permissions/default-permissions-coral.xml
 
 # Display
 $(call soong_config_set,qtidisplay,drmpp,true)
