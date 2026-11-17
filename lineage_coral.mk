@@ -15,12 +15,8 @@ PRODUCT_NO_CAMERA := true
 PRODUCT_BUILD_IGNORE_APEX_CONTRIBUTION_CONTENTS := true
 PRODUCT_MODULE_BUILD_FROM_SOURCE := true
 
-# Infinity-X About Phone Definitions
-# Product partition: vendor_init may not set these non-vendor props
-PRODUCT_PRODUCT_PROPERTIES += \
-    ro.product.marketname=Google Pixel 4 XL \
-    ro.rising.chipset=Snapdragon 855 \
-    ro.rising.camera=12.2MP + 16MP
+# RisingOS About Phone properties: market name and camera are in product.prop.
+# RisingChipset below generates ro.rising.chipset; do not define it twice.
 
 PRODUCT_BUILD_PROP_OVERRIDES += \
     RisingChipset="Qualcomm Snapdragon 855" \
